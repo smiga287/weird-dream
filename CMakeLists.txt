@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.11)
-set(PROJECT_NAME project_base)
+set(PROJECT_NAME futurama)
 project(${PROJECT_NAME})
 
 function(watch)
@@ -11,7 +11,7 @@ function(watch)
 endfunction()
 
 set(CMAKE_POLICY_DEFAULT_CMP0012 NEW)
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 20)
 
 list(APPEND CMAKE_CXX_FLAGS "-Wall -Wextra -Wno-unused-variable -Wno-unused-parameter -O3")
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/modules")
@@ -42,8 +42,7 @@ include_directories(${CMAKE_BINARY_DIR}/configuration)
 
 
 include_directories(include/)
-add_executable(${PROJECT_NAME}
-        ${SOURCES})
+add_executable(${PROJECT_NAME} ${SOURCES})
 
 target_link_libraries(${PROJECT_NAME} ${LIBS})
 
