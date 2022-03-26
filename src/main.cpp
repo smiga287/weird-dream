@@ -1,19 +1,12 @@
+#include "Skybox.h"
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
-
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-
-#include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
-
-#include <learnopengl/filesystem.h>
-#include <learnopengl/shader.h>
 #include <learnopengl/camera.h>
 #include <learnopengl/model.h>
-
 #include <iostream>
 
 void framebuffer_size_callback(GLFWwindow *window, int width, int height);
@@ -67,35 +60,9 @@ struct ProgramState {
     void LoadFromFile(std::string filename);
 };
 
-void ProgramState::SaveToFile(std::string filename) {
-    std::ofstream out(filename);
-    out << clearColor.r << '\n'
-        << clearColor.g << '\n'
-        << clearColor.b << '\n'
-        << ImGuiEnabled << '\n'
-        << camera.Position.x << '\n'
-        << camera.Position.y << '\n'
-        << camera.Position.z << '\n'
-        << camera.Front.x << '\n'
-        << camera.Front.y << '\n'
-        << camera.Front.z << '\n';
-}
+void ProgramState::SaveToFile(std::string filename) {}
 
-void ProgramState::LoadFromFile(std::string filename) {
-    std::ifstream in(filename);
-    if (in) {
-        in >> clearColor.r
-           >> clearColor.g
-           >> clearColor.b
-           >> ImGuiEnabled
-           >> camera.Position.x
-           >> camera.Position.y
-           >> camera.Position.z
-           >> camera.Front.x
-           >> camera.Front.y
-           >> camera.Front.z;
-    }
-}
+void ProgramState::LoadFromFile(std::string filename) {}
 
 ProgramState *programState;
 
@@ -137,7 +104,7 @@ int main() {
     }
 
     // tell stb_image.h to flip loaded texture's on the y-axis (before loading model).
-    stbi_set_flip_vertically_on_load(true);
+//    stbi_set_flip_vertically_on_load(true);
 
     programState = new ProgramState;
     programState->LoadFromFile("resources/program_state.txt");
@@ -161,6 +128,8 @@ int main() {
 
     // build and compile shaders
     // -------------------------
+
+    Shader skybox_shader("resources/shaders/skybox.vs", "resources/shaders/skybox.fs");
     Shader ourShader("resources/shaders/2.model_lighting.vs", "resources/shaders/2.model_lighting.fs");
 
     // load models
@@ -178,6 +147,11 @@ int main() {
     pointLight.linear = 0.09f;
     pointLight.quadratic = 0.032f;
 
+    // setup
+    auto skybox = Skybox{skybox_shader};
+
+    // load textures
+    skybox.loadTextures();
 
 
     // draw in wireframe
@@ -202,7 +176,7 @@ int main() {
         glClearColor(programState->clearColor.r, programState->clearColor.g, programState->clearColor.b, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        // don't forget to enable shader before setting uniforms
+        // don't forget to enable shader_ before setting uniforms
         ourShader.use();
         pointLight.position = glm::vec3(4.0 * cos(currentFrame), 4.0f, 4.0 * sin(currentFrame));
         ourShader.setVec3("pointLight.position", pointLight.position);
@@ -228,6 +202,9 @@ int main() {
         model = glm::scale(model, glm::vec3(programState->backpackScale));    // it's a bit too big for our scene, so scale it down
         ourShader.setMat4("model", model);
         ourModel.Draw(ourShader);
+
+        auto skybox_view = glm::mat4(glm::mat3(programState->camera.GetViewMatrix())); // remove translation from the view matrix
+        skybox.render(skybox_view, projection);
 
         if (programState->ImGuiEnabled)
             DrawImGui(programState);
