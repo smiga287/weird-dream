@@ -14,27 +14,35 @@ public:
 
     template<class Callback>
     GlfwWindowBuilder& setFramebufferSizeCallback(Callback cb) {
-        glfwSetFramebufferSizeCallback(window_.window(), cb);
+        glfwSetFramebufferSizeCallback(window_.get_raw_window(), cb);
         return *this;
     }
     template<class Callback>
     GlfwWindowBuilder& setMouseCallback(Callback cb) {
-        glfwSetCursorPosCallback(window_.window(), cb);
+        glfwSetCursorPosCallback(window_.get_raw_window(), cb);
         return *this;
     }
     template<class Callback>
     GlfwWindowBuilder& setScrollCallback(Callback cb) {
-        glfwSetScrollCallback(window_.window(), cb);
+        glfwSetScrollCallback(window_.get_raw_window(), cb);
         return *this;
     }
     template<class Callback>
     GlfwWindowBuilder& setKeyCallback(Callback cb) {
-        glfwSetKeyCallback(window_.window(), cb);
+        glfwSetKeyCallback(window_.get_raw_window(), cb);
         return *this;
     }
 
-    // Implicit cast operator so that the user never needs to know they interact with a builder
-    operator GlfwWindow() const { return window_; }
+    GlfwWindow* build() {
+        // We load glad only when we've already set up all of the callbacks
+        // glad: load all OpenGL function pointers
+        if (!gladLoadGLLoader((GLADloadproc) glfwGetProcAddress)) {
+            std::cerr << "Failed to initialize GLAD" << std::endl;
+            std::exit(1);
+        }
+
+        return &window_;
+    }
 private:
     GlfwWindow window_;
 };
