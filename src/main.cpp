@@ -10,6 +10,7 @@
 #include <memory>
 #include <ImGuiFacade.h>
 #include <program_state.h>
+#include <Floor.h>
 
 // settings
 const unsigned int SCR_WIDTH = 800;
@@ -66,9 +67,11 @@ int main() {
 
     // setup
     auto skybox = Skybox{skybox_shader};
+    auto floor = Floor{ourShader};
 
     // load textures
     skybox.loadTextures();
+    floor.loadTextures();
 
     // draw in wireframe
     // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -114,7 +117,15 @@ int main() {
         ourModel.Draw(ourShader);
 
         auto skybox_view = glm::mat4(glm::mat3(programState->camera.GetViewMatrix())); // remove translation from the view matrix
-        skybox.render(skybox_view, projection);
+        skybox.render(glm::mat4(1.0f), skybox_view, projection);
+
+        // world transformation
+        model = glm::mat4(1.0f);
+        model = glm::translate(model, glm::vec3(0.0f, -0.51f, 0.0f));
+        model = glm::rotate(model, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+        model = glm::scale(model, glm::vec3(25.0f));
+        view = glm::mat4(glm::mat3(programState->camera.GetViewMatrix())); // remove translation from the view matrix
+        floor.render(model, view, projection);
 
         if (programState->ImGuiEnabled)
             imGui.draw(programState.get());
