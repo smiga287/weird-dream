@@ -8,6 +8,9 @@
 #include <learnopengl/camera.h>
 #include <learnopengl/model.h>
 #include <iostream>
+#include <GlfwWindow.h>
+#include <GlfwWindowBuilder.h>
+#include <memory>
 
 void framebuffer_size_callback(GLFWwindow *window, int width, int height);
 
@@ -15,7 +18,7 @@ void mouse_callback(GLFWwindow *window, double xpos, double ypos);
 
 void scroll_callback(GLFWwindow *window, double xoffset, double yoffset);
 
-void processInput(GLFWwindow *window);
+void processInput(GlfwWindow *window);
 
 void key_callback(GLFWwindow *window, int key, int scancode, int action, int mods);
 
@@ -64,52 +67,25 @@ void ProgramState::SaveToFile(std::string filename) {}
 
 void ProgramState::LoadFromFile(std::string filename) {}
 
-ProgramState *programState;
+std::unique_ptr<ProgramState> programState;
 
 void DrawImGui(ProgramState *programState);
 
 int main() {
-    // glfw: initialize and configure
-    // ------------------------------
-    glfwInit();
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-
-#ifdef __APPLE__
-    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-#endif
-
-    // glfw window creation
-    // --------------------
-    GLFWwindow *window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "LearnOpenGL", NULL, NULL);
-    if (window == NULL) {
-        std::cout << "Failed to create GLFW window" << std::endl;
-        glfwTerminate();
-        return -1;
-    }
-    glfwMakeContextCurrent(window);
-    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
-    glfwSetCursorPosCallback(window, mouse_callback);
-    glfwSetScrollCallback(window, scroll_callback);
-    glfwSetKeyCallback(window, key_callback);
-    // tell GLFW to capture our mouse
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-
-    // glad: load all OpenGL function pointers
-    // ---------------------------------------
-    if (!gladLoadGLLoader((GLADloadproc) glfwGetProcAddress)) {
-        std::cout << "Failed to initialize GLAD" << std::endl;
-        return -1;
-    }
-
+    auto builder = GlfwWindow::create(SCR_WIDTH, SCR_HEIGHT, "Futurama");
+    GlfwWindow* window = builder
+            .setFramebufferSizeCallback(framebuffer_size_callback)
+            .setMouseCallback(mouse_callback)
+            .setScrollCallback(scroll_callback)
+            .setKeyCallback(key_callback)
+            .build();
     // tell stb_image.h to flip loaded texture's on the y-axis (before loading model).
-//    stbi_set_flip_vertically_on_load(true);
+    // stbi_set_flip_vertically_on_load(true);
 
-    programState = new ProgramState;
+    programState = std::make_unique<ProgramState>();
     programState->LoadFromFile("resources/program_state.txt");
     if (programState->ImGuiEnabled) {
-        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+        glfwSetInputMode(window->get_raw_window(), GLFW_CURSOR, GLFW_CURSOR_NORMAL);
     }
     // Init Imgui
     IMGUI_CHECKVERSION();
@@ -117,9 +93,7 @@ int main() {
     ImGuiIO &io = ImGui::GetIO();
     (void) io;
 
-
-
-    ImGui_ImplGlfw_InitForOpenGL(window, true);
+    ImGui_ImplGlfw_InitForOpenGL(window->get_raw_window(), true);
     ImGui_ImplOpenGL3_Init("#version 330 core");
 
     // configure global opengl state
@@ -128,7 +102,6 @@ int main() {
 
     // build and compile shaders
     // -------------------------
-
     Shader skybox_shader("resources/shaders/skybox.vs", "resources/shaders/skybox.fs");
     Shader ourShader("resources/shaders/2.model_lighting.vs", "resources/shaders/2.model_lighting.fs");
 
@@ -159,7 +132,7 @@ int main() {
 
     // render loop
     // -----------
-    while (!glfwWindowShouldClose(window)) {
+    while (!window->shouldClose()) {
         // per-frame time logic
         // --------------------
         float currentFrame = glfwGetTime();
@@ -207,40 +180,33 @@ int main() {
         skybox.render(skybox_view, projection);
 
         if (programState->ImGuiEnabled)
-            DrawImGui(programState);
-
-
+            DrawImGui(programState.get());
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
-        // -------------------------------------------------------------------------------
-        glfwSwapBuffers(window);
-        glfwPollEvents();
+        window->swapBuffers();
+        window->pollEvents();
     }
 
     programState->SaveToFile("resources/program_state.txt");
-    delete programState;
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();
     ImGui::DestroyContext();
-    // glfw: terminate, clearing all previously allocated GLFW resources.
-    // ------------------------------------------------------------------
-    glfwTerminate();
     return 0;
 }
 
 // process all input: query GLFW whether relevant keys are pressed/released this frame and react accordingly
 // ---------------------------------------------------------------------------------------------------------
-void processInput(GLFWwindow *window) {
-    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-        glfwSetWindowShouldClose(window, true);
+void processInput(GlfwWindow *window) {
+    if (window->isKeyPressed(GLFW_KEY_ESCAPE))
+        window->setShouldClose(true);
 
-    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+    if (window->isKeyPressed(GLFW_KEY_W))
         programState->camera.ProcessKeyboard(FORWARD, deltaTime);
-    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+    if (window->isKeyPressed(GLFW_KEY_S))
         programState->camera.ProcessKeyboard(BACKWARD, deltaTime);
-    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+    if (window->isKeyPressed(GLFW_KEY_A))
         programState->camera.ProcessKeyboard(LEFT, deltaTime);
-    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+    if (window->isKeyPressed(GLFW_KEY_D))
         programState->camera.ProcessKeyboard(RIGHT, deltaTime);
 }
 
