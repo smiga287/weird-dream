@@ -7,27 +7,17 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <learnopengl/camera.h>
 #include <learnopengl/model.h>
-#include <iostream>
 #include <GlfwWindow.h>
 #include <GlfwWindowBuilder.h>
 #include <memory>
-
-void framebuffer_size_callback(GLFWwindow *window, int width, int height);
-
-void mouse_callback(GLFWwindow *window, double xpos, double ypos);
-
-void scroll_callback(GLFWwindow *window, double xoffset, double yoffset);
-
-void processInput(GlfwWindow *window);
-
-void key_callback(GLFWwindow *window, int key, int scancode, int action, int mods);
+#include <ImGuiFacade.h>
+#include <program_state.h>
 
 // settings
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
 
 // camera
-
 float lastX = SCR_WIDTH / 2.0f;
 float lastY = SCR_HEIGHT / 2.0f;
 bool firstMouse = true;
@@ -36,40 +26,7 @@ bool firstMouse = true;
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
 
-struct PointLight {
-    glm::vec3 position;
-    glm::vec3 ambient;
-    glm::vec3 diffuse;
-    glm::vec3 specular;
-
-    float constant;
-    float linear;
-    float quadratic;
-};
-
-struct ProgramState {
-    glm::vec3 clearColor = glm::vec3(0);
-    bool ImGuiEnabled = false;
-    Camera camera;
-    bool CameraMouseMovementUpdateEnabled = true;
-    glm::vec3 backpackPosition = glm::vec3(0.0f);
-    float backpackScale = 1.0f;
-    PointLight pointLight;
-    ProgramState()
-            : camera(glm::vec3(0.0f, 0.0f, 3.0f)) {}
-
-    void SaveToFile(std::string filename);
-
-    void LoadFromFile(std::string filename);
-};
-
-void ProgramState::SaveToFile(std::string filename) {}
-
-void ProgramState::LoadFromFile(std::string filename) {}
-
 std::unique_ptr<ProgramState> programState;
-
-void DrawImGui(ProgramState *programState);
 
 int main() {
     auto builder = GlfwWindow::create(SCR_WIDTH, SCR_HEIGHT, "Futurama");
@@ -79,22 +36,13 @@ int main() {
             .setScrollCallback(scroll_callback)
             .setKeyCallback(key_callback)
             .build();
-    // tell stb_image.h to flip loaded texture's on the y-axis (before loading model).
-    // stbi_set_flip_vertically_on_load(true);
 
     programState = std::make_unique<ProgramState>();
     programState->LoadFromFile("resources/program_state.txt");
     if (programState->ImGuiEnabled) {
         glfwSetInputMode(window->get_raw_window(), GLFW_CURSOR, GLFW_CURSOR_NORMAL);
     }
-    // Init Imgui
-    IMGUI_CHECKVERSION();
-    ImGui::CreateContext();
-    ImGuiIO &io = ImGui::GetIO();
-    (void) io;
-
-    ImGui_ImplGlfw_InitForOpenGL(window->get_raw_window(), true);
-    ImGui_ImplOpenGL3_Init("#version 330 core");
+    auto imGui = ImGuiFacade{window};
 
     // configure global opengl state
     // -----------------------------
@@ -126,26 +74,21 @@ int main() {
     // load textures
     skybox.loadTextures();
 
-
     // draw in wireframe
     //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
     // render loop
-    // -----------
     while (!window->shouldClose()) {
         // per-frame time logic
-        // --------------------
         float currentFrame = glfwGetTime();
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
 
         // input
-        // -----
         processInput(window);
 
 
         // render
-        // ------
         glClearColor(programState->clearColor.r, programState->clearColor.g, programState->clearColor.b, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -170,8 +113,7 @@ int main() {
 
         // render the loaded model
         glm::mat4 model = glm::mat4(1.0f);
-        model = glm::translate(model,
-                               programState->backpackPosition); // translate it down so it's at the center of the scene
+        model = glm::translate(model, programState->backpackPosition); // translate it down so it's at the center of the scene
         model = glm::scale(model, glm::vec3(programState->backpackScale));    // it's a bit too big for our scene, so scale it down
         ourShader.setMat4("model", model);
         ourModel.Draw(ourShader);
@@ -180,7 +122,7 @@ int main() {
         skybox.render(skybox_view, projection);
 
         if (programState->ImGuiEnabled)
-            DrawImGui(programState.get());
+            imGui.draw(programState.get());
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         window->swapBuffers();
@@ -188,9 +130,6 @@ int main() {
     }
 
     programState->SaveToFile("resources/program_state.txt");
-    ImGui_ImplOpenGL3_Shutdown();
-    ImGui_ImplGlfw_Shutdown();
-    ImGui::DestroyContext();
     return 0;
 }
 
@@ -243,40 +182,6 @@ void scroll_callback(GLFWwindow *window, double xoffset, double yoffset) {
     programState->camera.ProcessMouseScroll(yoffset);
 }
 
-void DrawImGui(ProgramState *programState) {
-    ImGui_ImplOpenGL3_NewFrame();
-    ImGui_ImplGlfw_NewFrame();
-    ImGui::NewFrame();
-
-
-    {
-        static float f = 0.0f;
-        ImGui::Begin("Hello window");
-        ImGui::Text("Hello text");
-        ImGui::SliderFloat("Float slider", &f, 0.0, 1.0);
-        ImGui::ColorEdit3("Background color", (float *) &programState->clearColor);
-        ImGui::DragFloat3("Backpack position", (float*)&programState->backpackPosition);
-        ImGui::DragFloat("Backpack scale", &programState->backpackScale, 0.05, 0.1, 4.0);
-
-        ImGui::DragFloat("pointLight.constant", &programState->pointLight.constant, 0.05, 0.0, 1.0);
-        ImGui::DragFloat("pointLight.linear", &programState->pointLight.linear, 0.05, 0.0, 1.0);
-        ImGui::DragFloat("pointLight.quadratic", &programState->pointLight.quadratic, 0.05, 0.0, 1.0);
-        ImGui::End();
-    }
-
-    {
-        ImGui::Begin("Camera info");
-        const Camera& c = programState->camera;
-        ImGui::Text("Camera position: (%f, %f, %f)", c.Position.x, c.Position.y, c.Position.z);
-        ImGui::Text("(Yaw, Pitch): (%f, %f)", c.Yaw, c.Pitch);
-        ImGui::Text("Camera front: (%f, %f, %f)", c.Front.x, c.Front.y, c.Front.z);
-        ImGui::Checkbox("Camera mouse update", &programState->CameraMouseMovementUpdateEnabled);
-        ImGui::End();
-    }
-
-    ImGui::Render();
-    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-}
 
 void key_callback(GLFWwindow *window, int key, int scancode, int action, int mods) {
     if (key == GLFW_KEY_F1 && action == GLFW_PRESS) {
