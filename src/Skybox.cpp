@@ -12,13 +12,14 @@
 
 void Skybox::loadTextures() {
     const std::string SKYBOX_PATH = FileSystem::getPath("resources/textures/skybox/");
+    const std::string EXT = true ? ".jpg" : ".png";
     std::array skyboxSides = {
-            SKYBOX_PATH + "rt.png",
-            SKYBOX_PATH + "lf.png",
-            SKYBOX_PATH + "up.png",
-            SKYBOX_PATH + "dn.png",
-            SKYBOX_PATH + "bk.png",
-            SKYBOX_PATH + "ft.png"
+            SKYBOX_PATH + "rt" + EXT,
+            SKYBOX_PATH + "lf" + EXT,
+            SKYBOX_PATH + "up" + EXT,
+            SKYBOX_PATH + "dn" + EXT,
+            SKYBOX_PATH + "bk" + EXT,
+            SKYBOX_PATH + "ft" + EXT
     };
     cubemap_texture_ = loadCubemap(skyboxSides);
     shader_.use();
