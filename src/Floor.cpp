@@ -42,8 +42,13 @@ void Floor::deinitOpenGL() {
 }
 
 void Floor::loadTextures() {
+    // TODO: check if necessary
+    shader_.use();
+    shader_.setInt("material.diffuse", 0);
+    shader_.setInt("material.specular", 1);
+    shader_.setInt("material.specular2", 2);
+
     floor_specular_map_ = loadTexture(FileSystem::getPath("resources/textures/floor_diffuse_map.jpg"));
-    // floor textures
     floor_diffuse_map_ = loadTexture(FileSystem::getPath("resources/textures/floor_specular_map.jpg"));
 }
 

@@ -8,6 +8,9 @@
 #include <string>
 #include <learnopengl/camera.h>
 
+// settings
+const uint SCR_WIDTH = 800;
+const uint SCR_HEIGHT = 600;
 
 struct PointLight {
     glm::vec3 position;
@@ -28,8 +31,31 @@ struct ProgramState {
     glm::vec3 backpackPosition = glm::vec3(0.0f);
     float backpackScale = 1.0f;
     PointLight pointLight;
+
+    bool blinn = false;
+    bool flashLight = false;
+    glm::vec3 pointLightSource = glm::vec3{-6.0f, 0.2f, -5.6f};
+
+    // camera
+    float lastX = SCR_WIDTH / 2.0f;
+    float lastY = SCR_HEIGHT / 2.0f;
+    bool firstMouse = true;
+
+    // timing
+    float deltaTime = 0.0f;
+    float lastFrame = 0.0f;
+
     ProgramState()
-            : camera(glm::vec3(0.0f, 0.0f, 3.0f)) {}
+            : camera(glm::vec3(0.0f, 0.0f, 3.0f)),
+              pointLight{
+                  .position = glm::vec3(4.0f, 4.0, 0.0),
+                  .ambient = glm::vec3(0.1, 0.1, 0.1),
+                  .diffuse = glm::vec3(0.8, 0.8, 0.8),
+                  .specular = glm::vec3(1.0, 1.0, 1.0),
+                  .constant = 1.0f,
+                  .linear = 0.05f,
+                  .quadratic = 0.012f
+              } {}
 
     void SaveToFile(std::string filename);
 
