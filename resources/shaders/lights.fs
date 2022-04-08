@@ -60,8 +60,7 @@ vec3 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir);
 vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir);
 vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir);
 
-void main()
-{    
+void main() {
     // properties
     vec3 norm = normalize(Normal);
     vec3 viewDir = normalize(viewPos - FragPos);
@@ -84,8 +83,7 @@ void main()
 }
 
 // calculates the 8color when using a directional light.
-vec3 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir)
-{
+vec3 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir) {
     vec3 lightDir = normalize(-light.direction);
     // diffuse shading
     float diff = max(dot(normal, lightDir), 0.0);
@@ -97,7 +95,7 @@ vec3 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir)
         vec3 halfwayDir = normalize(lightDir + viewDir);
         spec = pow(max(dot(normal, halfwayDir), 0.0), material.shininess);
     } else {
-            spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
+        spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
     }
 
     // combine results
@@ -106,14 +104,13 @@ vec3 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir)
     // specular linear combination
     vec3 specularVar1 = vec3(texture(material.specular, TexCoords));
     vec3 specularVar2 = vec3(texture(material.specular2, TexCoords));
-    vec3 specularCombination = specularVar1 + 0.3f*specularVar2;
+    vec3 specularCombination = specularVar1 + 0.9f*specularVar2;
     vec3 specular = light.specular * spec * specularCombination;
     return (ambient + diffuse + specular);
 }
 
 // calculates the color when using a spot light.
-vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
-{
+vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir) {
     vec3 lightDir = normalize(light.position - fragPos);
     // diffuse shading
     float diff = max(dot(normal, lightDir), 0.0);
@@ -140,7 +137,7 @@ vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
     // specular linear combination
     vec3 specularVar1 = vec3(texture(material.specular, TexCoords));
     vec3 specularVar2 = vec3(texture(material.specular2, TexCoords));
-    vec3 specularCombination = specularVar1 + 0.3f*specularVar2;
+    vec3 specularCombination = specularVar1 + 0.9f*specularVar2;
     vec3 specular = light.specular * spec * specularCombination;
     ambient *= attenuation * intensity;
     diffuse *= attenuation * intensity;
