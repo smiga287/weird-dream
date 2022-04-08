@@ -36,7 +36,7 @@ int main() {
     Shader lights_shader("resources/shaders/lights.vs", "resources/shaders/lights.fs");
 
     // load models
-    Model ourModel("resources/objects/backpack/backpack.obj");
+    Model ourModel("resources/objects/building/Home_work5.fbx");
     ourModel.SetShaderTextureNamePrefix("material.");
 
     PointLight& pointLight = programState->pointLight;
@@ -82,7 +82,7 @@ int main() {
             lights_shader.setVec3("dirLight.specular", 1.0f, 1.0f, 1.0f);
 
             // point light setup
-            lights_shader.setVec3("pointLight.position", programState->pointLightSource);
+            lights_shader.setVec3("pointLight.position", pointLight.position);
             lights_shader.setVec3("pointLight.ambient", pointLight.ambient);
             lights_shader.setVec3("pointLight.diffuse", pointLight.diffuse);
             lights_shader.setVec3("pointLight.specular", pointLight.specular);
@@ -185,8 +185,9 @@ void mouse_callback(GLFWwindow *window, double xpos, double ypos) {
     lastX = xpos;
     lastY = ypos;
 
-    if (programState->CameraMouseMovementUpdateEnabled)
+    if (programState->CameraMouseMovementUpdateEnabled) {
         programState->camera.ProcessMouseMovement(xoffset, yoffset);
+    }
 }
 
 // glfw: whenever the mouse scroll wheel scrolls, this callback is called
@@ -201,6 +202,7 @@ void key_callback(GLFWwindow *window, int key, int scancode, int action, int mod
             programState->CameraMouseMovementUpdateEnabled = false;
             glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
         } else {
+            programState->CameraMouseMovementUpdateEnabled = true;
             glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
         }
     }
