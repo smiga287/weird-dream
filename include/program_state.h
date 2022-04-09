@@ -42,7 +42,7 @@ struct ProgramState {
     PointLight pointLight;
 
     bool is_blinn_enabled = false;
-    bool is_flashlight_enabled = false;
+    bool is_flashlight_enabled = true;
     glm::vec3 pointLightSource = glm::vec3{-6.0f, 0.2f, -5.6f};
 
     // camera
@@ -68,7 +68,7 @@ struct ProgramState {
                   .quadratic = 0.012f
               } {}
 
-    void saveToFile(const std::string &filename);
+    void saveToFile(const std::string &filename) const;
 
     void loadFromFile(const std::string &filename);
 };
@@ -77,7 +77,7 @@ struct ProgramState {
 const char SEPARATOR = '\n';
 
 // TODO: figure out what to do with program_state.txt
-inline void ProgramState::saveToFile(const std::string &filename) {
+inline void ProgramState::saveToFile(const std::string &filename) const {
     auto out = std::ofstream{filename};
     out << is_ImGui_enabled << SEPARATOR
         << is_wireframe_enabled << SEPARATOR
