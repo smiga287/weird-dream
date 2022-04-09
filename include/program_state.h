@@ -11,6 +11,7 @@
 // settings
 const uint SCR_WIDTH = 800;
 const uint SCR_HEIGHT = 600;
+const float aspect = (float) SCR_WIDTH / SCR_HEIGHT;
 
 struct PointLight {
     glm::vec3 position;
@@ -23,13 +24,19 @@ struct PointLight {
     float quadratic;
 };
 
+// Caches data which should be calculated only once per frame
+struct FrameMemo {
+    glm::mat4 projection;
+    glm::mat4 view;
+};
+
 struct ProgramState {
     glm::vec3 clearColor = glm::vec3(0);
     bool ImGuiEnabled = false;
     Camera camera;
     bool CameraMouseMovementUpdateEnabled = true;
-    glm::vec3 backpackPosition = glm::vec3(0.0f);
-    float backpackScale = 1.0f;
+    glm::vec3 building_position = glm::vec3(0.0f);
+    float building_scale = 1.0f;
     PointLight pointLight;
 
     bool blinn = false;
@@ -41,9 +48,13 @@ struct ProgramState {
     float lastY = SCR_HEIGHT / 2.0f;
     bool firstMouse = true;
 
+    FrameMemo frame_memo;
+
     // timing
     float deltaTime = 0.0f;
     float lastFrame = 0.0f;
+
+    bool is_wireframe_enabled = false;
 
     ProgramState()
             : camera(glm::vec3(0.0f, 0.0f, 3.0f)),

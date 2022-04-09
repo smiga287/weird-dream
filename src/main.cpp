@@ -11,6 +11,7 @@
 #include <ImGuiFacade.h>
 #include <program_state.h>
 #include <Floor.h>
+#include <drawing.h>
 
 std::unique_ptr<ProgramState> programState;
 
@@ -32,15 +33,12 @@ int main() {
     glEnable(GL_DEPTH_TEST);
 
     // build and compile shaders
-    Shader skybox_shader("resources/shaders/skybox.vs", "resources/shaders/skybox.fs");
-    Shader lights_shader("resources/shaders/lights.vs", "resources/shaders/lights.fs");
+    auto skybox_shader = Shader{"resources/shaders/skybox.vs", "resources/shaders/skybox.fs"};
+    auto lights_shader = Shader{"resources/shaders/lights.vs", "resources/shaders/lights.fs"};
 
     // load models
-    Model ourModel("resources/objects/building/Home_work5.fbx");
-    ourModel.SetShaderTextureNamePrefix("material.");
-
-    PointLight& pointLight = programState->pointLight;
-    auto& camera = programState->camera;
+    auto building_model = Model{"resources/objects/building/Home_work5.fbx"};
+    building_model.SetShaderTextureNamePrefix("material.");
 
     // setup
     auto skybox = Skybox{skybox_shader};
@@ -50,17 +48,12 @@ int main() {
     skybox.loadTextures();
     floor.loadTextures();
 
-    // draw in wireframe
-    // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-
-    // render loop
     while (!window->shouldClose()) {
         // per-frame time logic
         float currentFrame = glfwGetTime();
         programState->deltaTime = currentFrame - programState->lastFrame;
         programState->lastFrame = currentFrame;
 
-        // input
         processInput(window);
 
         // render
@@ -68,69 +61,27 @@ int main() {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         // lights shader setup
-        {
-            lights_shader.use();
-            lights_shader.setVec3("viewPos", camera.Position);
-            lights_shader.setFloat("material.shininess", 16.0f); // TODO: try out 32.0f
-            lights_shader.setInt("blinn", programState->blinn);
-            lights_shader.setInt("flashLight", programState->flashLight);
+        setup_lighting(lights_shader, *programState);
 
-            // directional light setup
-            lights_shader.setVec3("dirLight.direction", 1.0f, -0.5f, 0.0f);
-            lights_shader.setVec3("dirLight.ambient", 0.01f, 0.01f, 0.01f);
-            lights_shader.setVec3("dirLight.diffuse", 0.4f, 0.4f, 0.4f);
-            lights_shader.setVec3("dirLight.specular", 1.0f, 1.0f, 1.0f);
-
-            // point light setup
-            lights_shader.setVec3("pointLight.position", pointLight.position);
-            lights_shader.setVec3("pointLight.ambient", pointLight.ambient);
-            lights_shader.setVec3("pointLight.diffuse", pointLight.diffuse);
-            lights_shader.setVec3("pointLight.specular", pointLight.specular);
-            lights_shader.setFloat("pointLight.constant", pointLight.constant);
-            lights_shader.setFloat("pointLight.linear", pointLight.linear);
-            lights_shader.setFloat("pointLight.quadratic", pointLight.quadratic);
-
-            // spotlight setup
-            lights_shader.setVec3("spotLight.position", camera.Position);
-            lights_shader.setVec3("spotLight.direction", camera.Front);
-            lights_shader.setVec3("spotLight.ambient", 0.0f, 0.0f, 0.0f);
-            lights_shader.setVec3("spotLight.diffuse", 0.7f, 0.7f, 0.7f);
-            lights_shader.setVec3("spotLight.specular", 1.0f, 1.0f, 1.0f);
-            lights_shader.setFloat("spotLight.constant", 1.0f);
-            lights_shader.setFloat("spotLight.linear", 0.05);
-            lights_shader.setFloat("spotLight.quadratic", 0.012);
-            lights_shader.setFloat("spotLight.cutOff", glm::cos(glm::radians(10.5f)));
-            lights_shader.setFloat("spotLight.outerCutOff", glm::cos(glm::radians(13.0f)));
-        }
-
-        // don't forget to enable shader_ before setting uniforms
-        pointLight.position = glm::vec3(4.0 * cos(currentFrame), 4.0f, 4.0 * sin(currentFrame));
+        programState->pointLight.position = glm::vec3(4.0 * cos(currentFrame), 4.0f, 4.0 * sin(currentFrame));
 
         // view/projection transformations
-        glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom),
-                                                (float) SCR_WIDTH / (float) SCR_HEIGHT, 0.1f, 100.0f);
+        glm::mat4 projection = glm::perspective(glm::radians(programState->camera.Zoom), aspect, 0.1f, 100.0f);
         glm::mat4 view = programState->camera.GetViewMatrix();
+        programState->frame_memo.projection = projection;
+        programState->frame_memo.view = view;
 
-        // render the loaded model
-        glm::mat4 model = glm::mat4(1.0f);
-        model = glm::translate(model, programState->backpackPosition); // translate it down so it's at the center of the scene
-        model = glm::scale(model, glm::vec3(programState->backpackScale));    // it's a bit too big for our scene, so scale it down
-        lights_shader.use();
-        lights_shader.setMat4("model", model);
-        ourModel.Draw(lights_shader);
-
-        auto skybox_view = glm::mat4(glm::mat3(view));
-        skybox.render(glm::mat4(1.0f), skybox_view, projection);
-
-        // world transformation
-        model = glm::mat4(1.0f);
-        model = glm::translate(model, glm::vec3(0.0f, -0.51f, 0.0f));
-        model = glm::rotate(model, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-        model = glm::scale(model, glm::vec3(25.0f));
-        floor.render(model, view, projection);
+        // render everything
+        draw_building(building_model, lights_shader, *programState);
+        draw_skybox(skybox, *programState);
+        draw_floor(floor, *programState);
 
         if (programState->ImGuiEnabled) {
             imGui.draw(programState.get());
+        }
+
+        if (programState->is_wireframe_enabled) {
+            glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
         }
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
