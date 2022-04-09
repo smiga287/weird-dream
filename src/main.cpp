@@ -119,7 +119,7 @@ int main() {
         lights_shader.setMat4("model", model);
         ourModel.Draw(lights_shader);
 
-        auto skybox_view = glm::mat4(glm::mat3(programState->camera.GetViewMatrix()));
+        auto skybox_view = glm::mat4(glm::mat3(view));
         skybox.render(glm::mat4(1.0f), skybox_view, projection);
 
         // world transformation
@@ -143,7 +143,6 @@ int main() {
 }
 
 // process all input: query GLFW whether relevant keys are pressed/released this frame and react accordingly
-// ---------------------------------------------------------------------------------------------------------
 void processInput(GlfwWindow *window) {
     if (window->isKeyPressed(GLFW_KEY_ESCAPE))
         window->setShouldClose(true);
