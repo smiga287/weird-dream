@@ -34,6 +34,11 @@ void ImGuiFacade::draw(ProgramState* programState) {
         ImGui::DragFloat3("Building position", (float*)&programState->building_position);
         ImGui::DragFloat("Building scale", &programState->building_scale, 0.05, 0.1, 4.0);
 
+        ImGui::Checkbox("Flashlight", &programState->is_flashlight_enabled);
+        ImGui::Checkbox("Blinn", &programState->is_blinn_enabled);
+        ImGui::Checkbox("Bloom", &programState->is_bloom_enabled);
+        ImGui::DragFloat("Exposure", &programState->exposure, 0.05, 0.0, 1.0);
+
         ImGui::DragFloat("pointLight.constant", &programState->pointLight.constant, 0.05, 0.0, 1.0);
         ImGui::DragFloat("pointLight.linear", &programState->pointLight.linear, 0.05, 0.0, 1.0);
         ImGui::DragFloat("pointLight.quadratic", &programState->pointLight.quadratic, 0.05, 0.0, 1.0);
