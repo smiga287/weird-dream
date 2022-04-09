@@ -42,7 +42,7 @@ public:
     }
 
     // render the mesh
-    void Draw(Shader &shader) {
+    void Draw(const Shader& shader) const {
         // bind appropriate textures
         uint diffuseNr  = 1;
         uint specularNr = 1;

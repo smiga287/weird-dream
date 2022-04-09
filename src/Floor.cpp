@@ -86,7 +86,7 @@ uint Floor::loadTexture(const std::string& path) {
     return textureID;
 }
 
-void Floor::render(const glm::mat4 &model, const glm::mat4 &view, const glm::mat4 &projection) {
+void Floor::render(const glm::mat4 &model, const glm::mat4 &view, const glm::mat4 &projection) const {
     shader_.use();
     shader_.setMat4("model", model);
     shader_.setMat4("view", view);

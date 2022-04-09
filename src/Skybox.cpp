@@ -51,7 +51,7 @@ uint Skybox::loadCubemap(std::span<std::string> faces) {
     return textureID;
 }
 
-void Skybox::render(const glm::mat4 &model, const glm::mat4 &view, const glm::mat4 &projection) {
+void Skybox::render(const glm::mat4 &model, const glm::mat4 &view, const glm::mat4 &projection) const {
     // skybox shader setup
     glDepthFunc(GL_LEQUAL);  // change depth function so depth test passes when values are equal to depth buffer's content
     shader_.use();

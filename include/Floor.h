@@ -18,7 +18,7 @@ public:
     explicit Floor(const Shader& shader);
 
     void loadTextures();
-    void render(const glm::mat4 &model, const glm::mat4 &view, const glm::mat4 &projection);
+    void render(const glm::mat4 &model, const glm::mat4 &view, const glm::mat4 &projection) const;
 
     // Given that we have a destructor, we should follow the rule of 5
     ~Floor();
