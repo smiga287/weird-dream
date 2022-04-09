@@ -5,6 +5,7 @@
 #include <Floor.h>
 #include <sstream>
 #include <array>
+#include <Benders.h>
 
 void setup_lighting(const Shader& lights_shader, const ProgramState& state) {
     const PointLight& pointLight = state.pointLight;
@@ -60,18 +61,18 @@ void setup_lighting(const Shader& lights_shader, const ProgramState& state) {
 }
 
 void draw_skybox(const Skybox& skybox, const ProgramState& state) {
-    const FrameMemo& frame_metadata = state.frame_memo;
-    auto skybox_view = glm::mat4(glm::mat3(frame_metadata.view));
-    skybox.render(glm::mat4(1.0f), skybox_view, frame_metadata.projection);
+    const auto& frame_memo = state.frame_memo;
+    auto skybox_view = glm::mat4(glm::mat3(frame_memo.view));
+    skybox.render(glm::mat4(1.0f), skybox_view, frame_memo.projection);
 }
 
 void draw_floor(const Floor& floor, const ProgramState& state) {
-    const FrameMemo& frame_metadata = state.frame_memo;
+    const auto& frame_memo = state.frame_memo;
     glm::mat4 model = glm::mat4(1.0f);
     model = glm::translate(model, glm::vec3(0.0f, -0.51f, 0.0f));
     model = glm::rotate(model, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
     model = glm::scale(model, glm::vec3(25.0f));
-    floor.render(model, frame_metadata.view, frame_metadata.projection);
+    floor.render(model, frame_memo.view, frame_memo.projection);
 }
 
 void draw_building(const Model& building_model, const Shader& shader, const ProgramState& state) {
@@ -81,4 +82,14 @@ void draw_building(const Model& building_model, const Shader& shader, const Prog
     shader.use();
     shader.setMat4("model", model);
     building_model.Draw(shader);
+}
+
+void draw_benders(const Benders& benders, const Shader& shader, const ProgramState& state) {
+    const auto& frame_memo = state.frame_memo;
+    // set bender shader
+    shader.use();
+    shader.setMat4("projection", frame_memo.projection);
+    shader.setMat4("view", frame_memo.view);
+    shader.setInt("texture_diffuse", 0);
+    benders.render();
 }

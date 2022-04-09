@@ -12,6 +12,7 @@
 #include <program_state.h>
 #include <Floor.h>
 #include <drawing.h>
+#include <Benders.h>
 
 std::unique_ptr<ProgramState> programState;
 
@@ -38,14 +39,19 @@ int main() {
     // build and compile shaders
     auto skybox_shader = Shader{"resources/shaders/skybox.vs", "resources/shaders/skybox.fs"};
     auto lights_shader = Shader{"resources/shaders/lights.vs", "resources/shaders/lights.fs"};
+    auto instance_shader = Shader{"resources/shaders/instance.vs", "resources/shaders/instance.fs"};
 
     // load models
     auto building_model = Model{"resources/objects/building/Home_work5.fbx"};
     building_model.SetShaderTextureNamePrefix("material.");
 
+    auto bender_model = Model("resources/objects/bender/bender.obj");
+    bender_model.SetShaderTextureNamePrefix("material.");
+
     // setup
     auto skybox = Skybox{skybox_shader};
     auto floor = Floor{lights_shader};
+    auto benders = Benders{bender_model, instance_shader, 1000};
 
     // load textures
     skybox.loadTextures();
@@ -76,6 +82,7 @@ int main() {
         draw_building(building_model, lights_shader, *programState);
         draw_skybox(skybox, *programState);
         draw_floor(floor, *programState);
+        draw_benders(benders, instance_shader, *programState);
 
         if (programState->is_ImGui_enabled) {
             imGui.draw(programState.get());
