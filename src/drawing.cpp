@@ -3,6 +3,8 @@
 #include <learnopengl/model.h>
 #include <Skybox.h>
 #include <Floor.h>
+#include <sstream>
+#include <array>
 
 void setup_lighting(const Shader& lights_shader, const ProgramState& state) {
     const PointLight& pointLight = state.pointLight;
@@ -20,14 +22,29 @@ void setup_lighting(const Shader& lights_shader, const ProgramState& state) {
     lights_shader.setVec3("dirLight.diffuse", 0.4f, 0.4f, 0.4f);
     lights_shader.setVec3("dirLight.specular", 1.0f, 1.0f, 1.0f);
 
+    auto pointLightPositions = std::array{
+         glm::vec3(state.building_position.x + 8.5f, state.building_position.y + 3.2f, state.building_position.z + 4.5f),
+         glm::vec3(state.building_position.x + 6.5f, state.building_position.y + 3.7f, state.building_position.z - 3.0f),
+         glm::vec3(state.building_position.x - 5.2f, state.building_position.y + 3.7f, state.building_position.z + 9.0f),
+         glm::vec3(state.building_position.x - 10.5f, state.building_position.y + 3.7f, state.building_position.z + 7.0f),
+         glm::vec3(state.building_position.x + 0.5f, state.building_position.y + 6.0f, state.building_position.z + 3.0f)
+    };
+
     // point light setup
-    lights_shader.setVec3("pointLight.position", pointLight.position);
-    lights_shader.setVec3("pointLight.ambient", pointLight.ambient);
-    lights_shader.setVec3("pointLight.diffuse", pointLight.diffuse);
-    lights_shader.setVec3("pointLight.specular", pointLight.specular);
-    lights_shader.setFloat("pointLight.constant", pointLight.constant);
-    lights_shader.setFloat("pointLight.linear", pointLight.linear);
-    lights_shader.setFloat("pointLight.quadratic", pointLight.quadratic);
+    const int POINT_LIGHT_NUM = 6; // TODO: refactor
+    for (int i = 0; i < POINT_LIGHT_NUM; i++) {
+        std::stringstream point_light_stream;
+        point_light_stream << "pointLights[" << i << "].";
+        const auto& point_light = point_light_stream.str();
+
+        lights_shader.setVec3(point_light + "position", pointLightPositions[i]);
+        lights_shader.setVec3(point_light + "ambient", pointLight.ambient);
+        lights_shader.setVec3(point_light + "diffuse", pointLight.diffuse);
+        lights_shader.setVec3(point_light + "specular", pointLight.specular);
+        lights_shader.setFloat(point_light + "constant", pointLight.constant);
+        lights_shader.setFloat(point_light + "linear", pointLight.linear);
+        lights_shader.setFloat(point_light + "quadratic", pointLight.quadratic);
+    }
 
     // spotlight setup
     lights_shader.setVec3("spotLight.position", camera.Position);

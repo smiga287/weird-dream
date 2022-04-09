@@ -42,14 +42,12 @@ void Floor::deinitOpenGL() {
 }
 
 void Floor::loadTextures() {
-    // TODO: check if necessary
+    floor_specular_map_ = loadTexture(FileSystem::getPath("resources/textures/floor_diffuse_map.jpg"));
+    floor_diffuse_map_ = loadTexture(FileSystem::getPath("resources/textures/floor_specular_map.jpg"));
+
     shader_.use();
     shader_.setInt("material.diffuse", 0);
     shader_.setInt("material.specular", 1);
-    shader_.setInt("material.specular2", 2);
-
-    floor_specular_map_ = loadTexture(FileSystem::getPath("resources/textures/floor_diffuse_map.jpg"));
-    floor_diffuse_map_ = loadTexture(FileSystem::getPath("resources/textures/floor_specular_map.jpg"));
 }
 
 uint Floor::loadTexture(const std::string& path) {
@@ -94,7 +92,7 @@ void Floor::render(const glm::mat4 &model, const glm::mat4 &view, const glm::mat
 
     // floor setup
     // light properties
-    shader_.setVec3("dirLight.specular", 0.5f, 0.5f, 0.5f);
+//    shader_.setVec3("dirLight.specular", 0.5f, 0.5f, 0.5f);
 
     // material properties
     shader_.setFloat("material.shininess", 256.0f);
