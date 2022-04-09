@@ -76,25 +76,24 @@ struct ProgramState {
     void loadFromFile(const std::string &filename);
 };
 
-// TODO: Refactor
-const char SEPARATOR = '\n';
-
 // TODO: figure out what to do with program_state.txt
 inline void ProgramState::saveToFile(const std::string &filename) const {
     auto out = std::ofstream{filename};
-    out << is_ImGui_enabled << SEPARATOR
-        << is_wireframe_enabled << SEPARATOR
-        << is_camera_mouse_movement_enabled << SEPARATOR
-        << camera.Position.x << SEPARATOR
-        << camera.Position.y << SEPARATOR
-        << camera.Position.z << SEPARATOR
-        << camera.Front.x << SEPARATOR
-        << camera.Front.y << SEPARATOR
-        << camera.Front.z << SEPARATOR
-        << building_scale << SEPARATOR
-        << building_position.x << SEPARATOR
-        << building_position.y << SEPARATOR
-        << building_position.z << SEPARATOR;
+    out << is_ImGui_enabled << '\n'
+        << is_wireframe_enabled << '\n'
+        << is_camera_mouse_movement_enabled << '\n'
+        << camera.Position.x << '\n'
+        << camera.Position.y << '\n'
+        << camera.Position.z << '\n'
+        << camera.Front.x << '\n'
+        << camera.Front.y << '\n'
+        << camera.Front.z << '\n'
+        << building_scale << '\n'
+        << building_position.x << '\n'
+        << building_position.y << '\n'
+        << building_position.z << '\n'
+        << is_bloom_enabled << '\n'
+        << exposure << '\n';
 }
 
 inline void ProgramState::loadFromFile(const std::string &filename) {
@@ -111,7 +110,9 @@ inline void ProgramState::loadFromFile(const std::string &filename) {
         >> building_scale
         >> building_position.x
         >> building_position.y
-        >> building_position.z;
+        >> building_position.z
+        >> is_bloom_enabled
+        >> exposure;
 }
 
 // Move declarations from main
