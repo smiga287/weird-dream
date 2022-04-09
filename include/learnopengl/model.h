@@ -21,9 +21,7 @@
 #include <vector>
 using namespace std;
 
-unsigned int TextureFromFile(const char *path, const string &directory, bool gamma = false);
-
-
+inline unsigned int TextureFromFile(const char *path, const string &directory, bool gamma = false);
 
 class Model
 {
@@ -41,9 +39,8 @@ public:
     }
 
     // draws the model, and thus all its meshes
-    void Draw(Shader &shader)
-    {
-        for(unsigned int i = 0; i < meshes.size(); i++)
+    void Draw(const Shader &shader) const {
+        for (uint i = 0; i < meshes.size(); i++)
             meshes[i].Draw(shader);
     }
 
