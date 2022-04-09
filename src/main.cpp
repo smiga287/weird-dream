@@ -13,6 +13,7 @@
 #include <Floor.h>
 #include <drawing.h>
 #include <Benders.h>
+#include <Bloom.h>
 
 std::unique_ptr<ProgramState> programState;
 
@@ -38,8 +39,12 @@ int main() {
 
     // build and compile shaders
     auto skybox_shader = Shader{"resources/shaders/skybox.vs", "resources/shaders/skybox.fs"};
-    auto lights_shader = Shader{"resources/shaders/lights.vs", "resources/shaders/lights.fs"};
     auto instance_shader = Shader{"resources/shaders/instance.vs", "resources/shaders/instance.fs"};
+
+    auto lights_shader = Shader{"resources/shaders/lights.vs", "resources/shaders/lights.fs"};
+    auto lights_box_shader = Shader{"resources/shaders/lights.vs", "resources/shaders/lights_box.fs"};
+    auto lights_blur_shader = Shader{"resources/shaders/lights_blur.vs", "resources/shaders/lights_blur.fs"};
+    auto lights_merger_shader = Shader{"resources/shaders/lights_merger.vs", "resources/shaders/lights_merger.fs"};
 
     // load models
     auto building_model = Model{"resources/objects/building/Home_work5.fbx"};
@@ -52,6 +57,7 @@ int main() {
     auto skybox = Skybox{skybox_shader};
     auto floor = Floor{lights_shader};
     auto benders = Benders{bender_model, instance_shader, 1000};
+    auto bloom = Bloom{lights_shader, lights_box_shader, lights_blur_shader, lights_merger_shader};
 
     // load textures
     skybox.loadTextures();
@@ -67,10 +73,9 @@ int main() {
 
         // render
         glClearColor(programState->clearColor.r, programState->clearColor.g, programState->clearColor.b, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        // lights shader setup
-        setup_lighting(lights_shader, *programState);
+        // render scene into floating point framebuffer
+        bloom.setRenderScene();
 
         // view/projection transformations
         glm::mat4 projection = glm::perspective(glm::radians(programState->camera.Zoom), aspect, 0.1f, 100.0f);
@@ -78,11 +83,19 @@ int main() {
         programState->frame_memo.projection = projection;
         programState->frame_memo.view = view;
 
+        // lights shader setup
+        setup_lighting(lights_shader, lights_box_shader, *programState);
+
         // render everything
-        draw_building(building_model, lights_shader, *programState);
-        draw_skybox(skybox, *programState);
         draw_floor(floor, *programState);
+        draw_skybox(skybox, *programState);
+        draw_building(building_model, lights_shader, *programState);
         draw_benders(benders, instance_shader, *programState);
+
+        // blur bright fragments with two-pass Gaussian Blur
+        bloom.computeGaussianBlur();
+        // render floating point color buffer to 2D quad and tonemap HDR colors to default framebuffer's (clamped) color range
+        bloom.renderToQuadWithHDR(*programState);
 
         if (programState->is_ImGui_enabled) {
             imGui.draw(programState.get());
