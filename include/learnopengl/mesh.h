@@ -28,11 +28,6 @@ struct Texture {
 
 class Mesh {
 public:
-    // mesh Data
-    vector<Vertex>  vertices_;
-    vector<uint>    indices_;
-    vector<Texture> textures_;
-
     std::string glslIdentifierPrefix;
     // constructor
     Mesh(const vector<Vertex>& vertices, const vector<uint>& indices, const vector<Texture>& textures)
@@ -70,7 +65,7 @@ public:
 
 
         // draw mesh
-        glBindVertexArray(VAO);
+        glBindVertexArray(VAO_);
         glDrawElements(GL_TRIANGLES, indices_.size(), GL_UNSIGNED_INT, 0);
         glBindVertexArray(0);
 
@@ -79,26 +74,36 @@ public:
     }
 
 private:
+    // mesh Data
+    vector<Vertex>  vertices_;
+    vector<uint>    indices_;
+    vector<Texture> textures_;
+
     // render data
-    uint VAO, VBO, EBO;
+    uint VAO_, VBO_, EBO_;
+public:
+    [[nodiscard]] uint VAO() const { return VAO_; }
+    [[nodiscard]] const auto& indices() const { return indices_; }
+
+private:
 
     // initializes all the buffer objects/arrays
     void setupMesh()
     {
         // create buffers/arrays
-        glGenVertexArrays(1, &VAO);
-        glGenBuffers(1, &VBO);
-        glGenBuffers(1, &EBO);
+        glGenVertexArrays(1, &VAO_);
+        glGenBuffers(1, &VBO_);
+        glGenBuffers(1, &EBO_);
 
-        glBindVertexArray(VAO);
+        glBindVertexArray(VAO_);
         // load data into vertex buffers
-        glBindBuffer(GL_ARRAY_BUFFER, VBO);
+        glBindBuffer(GL_ARRAY_BUFFER, VBO_);
         // A great thing about structs is that their memory layout is sequential for all its items.
         // The effect is that we can simply pass a pointer to the struct and it translates perfectly to a glm::vec3/2 array which
         // again translates to 3/2 floats which translates to a byte array.
         glBufferData(GL_ARRAY_BUFFER, vertices_.size() * sizeof(Vertex), &vertices_[0], GL_STATIC_DRAW);
 
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO_);
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices_.size() * sizeof(unsigned int), &indices_[0], GL_STATIC_DRAW);
 
         // set the vertex attribute pointers
@@ -121,4 +126,5 @@ private:
         glBindVertexArray(0);
     }
 };
+
 #endif
