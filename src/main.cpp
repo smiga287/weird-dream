@@ -25,7 +25,7 @@ int main() {
             .build();
 
     programState = std::make_unique<ProgramState>();
-    programState->LoadFromFile("resources/program_state.txt");
+    programState->loadFromFile("resources/program_state.txt");
 
     auto imGui = ImGuiFacade{window};
 
@@ -63,6 +63,7 @@ int main() {
         // lights shader setup
         setup_lighting(lights_shader, *programState);
 
+        // update lighting
         programState->pointLight.position = glm::vec3(4.0 * cos(currentFrame), 4.0f, 4.0 * sin(currentFrame));
 
         // view/projection transformations
@@ -76,7 +77,7 @@ int main() {
         draw_skybox(skybox, *programState);
         draw_floor(floor, *programState);
 
-        if (programState->ImGuiEnabled) {
+        if (programState->is_ImGui_enabled) {
             imGui.draw(programState.get());
         }
 
@@ -89,7 +90,7 @@ int main() {
         window->pollEvents();
     }
 
-    programState->SaveToFile("resources/program_state.txt");
+    programState->saveToFile("resources/program_state.txt");
     return 0;
 }
 
@@ -119,7 +120,7 @@ void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
 
 // glfw: whenever the mouse moves, this callback is called
 void mouse_callback(GLFWwindow *window, double xpos, double ypos) {
-    auto& firstMouse = programState->firstMouse;
+    auto& firstMouse = programState->is_first_mouse;
     auto& lastX = programState->lastX;
     auto& lastY = programState->lastY;
 
@@ -135,7 +136,7 @@ void mouse_callback(GLFWwindow *window, double xpos, double ypos) {
     lastX = xpos;
     lastY = ypos;
 
-    if (programState->CameraMouseMovementUpdateEnabled) {
+    if (programState->is_camera_mouse_movement_enabled) {
         programState->camera.ProcessMouseMovement(xoffset, yoffset);
     }
 }
@@ -147,12 +148,12 @@ void scroll_callback(GLFWwindow *window, double xoffset, double yoffset) {
 
 void key_callback(GLFWwindow *window, int key, int scancode, int action, int mods) {
     if (key == GLFW_KEY_F1 && action == GLFW_PRESS) {
-        programState->ImGuiEnabled = !programState->ImGuiEnabled;
-        if (programState->ImGuiEnabled) {
-            programState->CameraMouseMovementUpdateEnabled = false;
+        programState->is_ImGui_enabled = !programState->is_ImGui_enabled;
+        if (programState->is_ImGui_enabled) {
+            programState->is_camera_mouse_movement_enabled = false;
             glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
         } else {
-            programState->CameraMouseMovementUpdateEnabled = true;
+            programState->is_camera_mouse_movement_enabled = true;
             glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
         }
     }

@@ -46,7 +46,7 @@ void ImGuiFacade::draw(ProgramState* programState) {
         ImGui::Text("Camera position: (%f, %f, %f)", c.Position.x, c.Position.y, c.Position.z);
         ImGui::Text("(Yaw, Pitch): (%f, %f)", c.Yaw, c.Pitch);
         ImGui::Text("Camera front: (%f, %f, %f)", c.Front.x, c.Front.y, c.Front.z);
-        ImGui::Checkbox("Camera mouse update", &programState->CameraMouseMovementUpdateEnabled);
+        ImGui::Checkbox("Camera mouse update", &programState->is_camera_mouse_movement_enabled);
         ImGui::End();
     }
 

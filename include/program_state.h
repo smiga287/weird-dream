@@ -7,6 +7,7 @@
 
 #include <string>
 #include <learnopengl/camera.h>
+#include <fstream>
 
 // settings
 const uint SCR_WIDTH = 800;
@@ -32,29 +33,28 @@ struct FrameMemo {
 
 struct ProgramState {
     glm::vec3 clearColor = glm::vec3(0);
-    bool ImGuiEnabled = false;
+    bool is_ImGui_enabled = false;
+    bool is_wireframe_enabled = false;
+    bool is_camera_mouse_movement_enabled = true;
     Camera camera;
-    bool CameraMouseMovementUpdateEnabled = true;
     glm::vec3 building_position = glm::vec3(0.0f);
     float building_scale = 1.0f;
     PointLight pointLight;
 
-    bool blinn = false;
-    bool flashLight = false;
+    bool is_blinn_enabled = false;
+    bool is_flashlight_enabled = false;
     glm::vec3 pointLightSource = glm::vec3{-6.0f, 0.2f, -5.6f};
 
     // camera
     float lastX = SCR_WIDTH / 2.0f;
     float lastY = SCR_HEIGHT / 2.0f;
-    bool firstMouse = true;
+    bool is_first_mouse = true;
 
     FrameMemo frame_memo;
 
     // timing
     float deltaTime = 0.0f;
     float lastFrame = 0.0f;
-
-    bool is_wireframe_enabled = false;
 
     ProgramState()
             : camera(glm::vec3(0.0f, 0.0f, 3.0f)),
@@ -68,14 +68,48 @@ struct ProgramState {
                   .quadratic = 0.012f
               } {}
 
-    void SaveToFile(std::string filename);
+    void saveToFile(const std::string &filename);
 
-    void LoadFromFile(std::string filename);
+    void loadFromFile(const std::string &filename);
 };
 
-inline void ProgramState::SaveToFile(std::string filename) {}
+// TODO: Refactor
+const char SEPARATOR = '\n';
 
-inline void ProgramState::LoadFromFile(std::string filename) {}
+// TODO: figure out what to do with program_state.txt
+inline void ProgramState::saveToFile(const std::string &filename) {
+    auto out = std::ofstream{filename};
+    out << is_ImGui_enabled << SEPARATOR
+        << is_wireframe_enabled << SEPARATOR
+        << is_camera_mouse_movement_enabled << SEPARATOR
+        << camera.Position.x << SEPARATOR
+        << camera.Position.y << SEPARATOR
+        << camera.Position.z << SEPARATOR
+        << camera.Front.x << SEPARATOR
+        << camera.Front.y << SEPARATOR
+        << camera.Front.z << SEPARATOR
+        << building_scale << SEPARATOR
+        << building_position.x << SEPARATOR
+        << building_position.y << SEPARATOR
+        << building_position.z << SEPARATOR;
+}
+
+inline void ProgramState::loadFromFile(const std::string &filename) {
+    auto in = std::ifstream{filename};
+    in  >> is_ImGui_enabled
+        >> is_wireframe_enabled
+        >> is_camera_mouse_movement_enabled
+        >> camera.Position.x
+        >> camera.Position.y
+        >> camera.Position.z
+        >> camera.Front.x
+        >> camera.Front.y
+        >> camera.Front.z
+        >> building_scale
+        >> building_position.x
+        >> building_position.y
+        >> building_position.z;
+}
 
 // Move declarations from main
 struct GLFWwindow;

@@ -11,8 +11,8 @@ void setup_lighting(const Shader& lights_shader, const ProgramState& state) {
     lights_shader.use();
     lights_shader.setVec3("viewPos", camera.Position);
     lights_shader.setFloat("material.shininess", 16.0f); // TODO: try out 32.0f
-    lights_shader.setInt("blinn", state.blinn);
-    lights_shader.setInt("flashLight", state.flashLight);
+    lights_shader.setInt("blinn", state.is_blinn_enabled);
+    lights_shader.setInt("flashLight", state.is_flashlight_enabled);
 
     // directional light setup
     lights_shader.setVec3("dirLight.direction", 1.0f, -0.5f, 0.0f);
