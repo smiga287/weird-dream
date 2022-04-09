@@ -31,6 +31,9 @@ int main() {
 
     // configure global opengl state
     glEnable(GL_DEPTH_TEST);
+    // Blending
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     // build and compile shaders
     auto skybox_shader = Shader{"resources/shaders/skybox.vs", "resources/shaders/skybox.fs"};
@@ -63,9 +66,6 @@ int main() {
         // lights shader setup
         setup_lighting(lights_shader, *programState);
 
-        // update lighting
-        programState->pointLight.position = glm::vec3(4.0 * cos(currentFrame), 4.0f, 4.0 * sin(currentFrame));
-
         // view/projection transformations
         glm::mat4 projection = glm::perspective(glm::radians(programState->camera.Zoom), aspect, 0.1f, 100.0f);
         glm::mat4 view = programState->camera.GetViewMatrix();
@@ -83,6 +83,8 @@ int main() {
 
         if (programState->is_wireframe_enabled) {
             glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        } else {
+            glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
         }
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
