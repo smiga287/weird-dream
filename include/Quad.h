@@ -10,7 +10,8 @@
 
 class Quad {
 public:
-    void render();
+    Quad();
+    void render() const;
 private:
     uint VAO_ = 0;
     uint VBO_;

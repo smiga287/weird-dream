@@ -86,8 +86,6 @@ void Bloom::renderToQuadWithHDR(const ProgramState &state) {
     lights_merger_shader_.setInt("bloom", state.is_bloom_enabled);
     lights_merger_shader_.setFloat("exposure", state.exposure);
     quad_.render();
-
-    std::cerr << "bloom: " << (state.is_bloom_enabled ? "on" : "off") << "| exposure: " << state.exposure << std::endl;
 }
 
 Bloom::Bloom(const Shader &lights_shader, const Shader &lights_box_shader,
