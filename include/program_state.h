@@ -10,8 +10,8 @@
 #include <fstream>
 
 // settings
-const uint SCR_WIDTH = 800;
-const uint SCR_HEIGHT = 600;
+const uint SCR_WIDTH = 1920;
+const uint SCR_HEIGHT = 1080;
 const float aspect = (float) SCR_WIDTH / SCR_HEIGHT;
 
 struct PointLight {
@@ -51,6 +51,9 @@ struct ProgramState {
     bool is_first_mouse = true;
 
     FrameMemo frame_memo;
+
+    bool is_bloom_enabled = true;
+    float exposure = 1.0f;
 
     // timing
     float deltaTime = 0.0f;
