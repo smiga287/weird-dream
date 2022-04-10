@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.11)
-set(PROJECT_NAME futurama)
+set(PROJECT_NAME weird_dream)
 project(${PROJECT_NAME})
 
 function(watch)

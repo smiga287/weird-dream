@@ -1,18 +1,18 @@
-#include <Benders.h>
+#include <Instances.h>
 #include <learnopengl/shader.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <algorithm>
 
-Benders::Benders(const Model& bender_model, const Shader& shader, int size) : bender_model_(bender_model), SIZE(size), models_(generate_random_models(size)), shader_(shader) {
+Instances::Instances(const Model& instance_model, const Shader& shader, int size) : bender_model_(instance_model), SIZE(size), models_(generate_random_models(size)), shader_(shader) {
     initOpenGL();
 }
 
-Benders::~Benders() {
+Instances::~Instances() {
     deinitOpenGL();
 }
 
-std::vector<glm::mat4> Benders::generate_random_models(int n) {
+std::vector<glm::mat4> Instances::generate_random_models(int n) {
     std::vector<glm::mat4> models(n, glm::mat4(1.0f));
     for (auto& model : models) {
         // translation
@@ -31,7 +31,7 @@ std::vector<glm::mat4> Benders::generate_random_models(int n) {
     return models;
 }
 
-void Benders::initOpenGL() {
+void Instances::initOpenGL() {
     uint buffer;
     glGenBuffers(1, &buffer);
     glBindBuffer(GL_ARRAY_BUFFER, buffer);
@@ -58,14 +58,14 @@ void Benders::initOpenGL() {
     }
 }
 
-void Benders::deinitOpenGL() {
+void Instances::deinitOpenGL() {
     // TODO: check this out
 //    for (uint i = 0; i < SIZE; i++){
 //        glDeleteVertexArrays(1, &(bender_model_.meshes[i].VAO()));
 //    }
 }
 
-void Benders::render() const {
+void Instances::render() const {
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, bender_model_.textures_loaded[0].id); // note: we also made the textures_loaded vector public (instead of private) from the model class.
     for (const auto& mesh : bender_model_.meshes) {
