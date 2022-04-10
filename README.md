@@ -1,11 +1,26 @@
-# project_base
-Prazan projekat sa pratećim bibliotekama koje koristimo na času. 
+# Weird dream
+- Computer Graphics project at Faculty of Mathematics, University of Belgrade
+- [Video Overview]()
+- Project was bootstrapped using the [project tempalte](https://github.com/matf-racunarska-grafika/project_base)
 
-# Uputstvo
-1. `git clone https://github.com/matf-racunarska-grafika/project_base.git`
-2. CLion -> Open -> path/to/my/project_base
-3. Main se nalazi u src/main.cpp
-4. Cpp fajlovi idu u src folder
-5. Zaglavlja (h i hpp) fajlovi idu u include
-6. Šejderi idu u folder shaders. `Vertex shader` ima ekstenziju `.vs`, `fragment shader` ima ekstenziju `.fs`
-7. ALT+SHIFT+F10 -> project_base -> run
+# Implemented
+
+- [x] Cubemaps
+- [x] Instancing
+- [x] HDR, Bloom
+
+# Requirements
+
+- `C++20` compatible compiler
+- `CMake >= 3.11`
+- All resources are included in the `resources/` directory
+
+# Installation and usage
+
+```bash
+$ git clone https://github.com/smiga287/futurama.git
+$ cd futurama
+$ mkdir build && cd build 
+$ cmake -G ninja .. # ninja is not mandatory, but is preferred
+$ ../weird_dream
+```
