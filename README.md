@@ -1,7 +1,7 @@
 # Weird dream
 - Computer Graphics project at Faculty of Mathematics, University of Belgrade
-- [Video Overview]()
-- Project was bootstrapped using the [project tempalte](https://github.com/matf-racunarska-grafika/project_base)
+- [Video Overview](https://youtu.be/JYE32pXT7FU)
+- Project was bootstrapped using the [project template](https://github.com/matf-racunarska-grafika/project_base)
 
 # Implemented
 
