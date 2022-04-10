@@ -1,0 +1,33 @@
+# Blender MTL File: 'ICE.blend'
+# Material Count: 3
+
+newmtl EYES
+Ns 359.999993
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+
+newmtl None
+Ns 500
+Ka 0.8 0.8 0.8
+Kd 0.8 0.8 0.8
+Ks 0.8 0.8 0.8
+d 1
+illum 2
+
+newmtl STONE
+Ns 60.247907
+Ka 1.000000 1.000000 1.000000
+Kd 0.337200 0.299679 0.295415
+Ks 0.259091 0.259091 0.259091
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Bump /home/smiga287/MATF/RG/project/futurama/resources/objects/kamen/normal.png
+map_Kd /home/smiga287/MATF/RG/project/futurama/resources/objects/kamen/diffuso.tif
+map_Ns /home/smiga287/MATF/RG/project/futurama/resources/objects/kamen/rough.tif
