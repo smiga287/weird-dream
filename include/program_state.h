@@ -93,7 +93,8 @@ inline void ProgramState::saveToFile(const std::string &filename) const {
         << building_position.y << '\n'
         << building_position.z << '\n'
         << is_bloom_enabled << '\n'
-        << exposure << '\n';
+        << exposure << '\n'
+        << is_blinn_enabled << '\n';
 }
 
 inline void ProgramState::loadFromFile(const std::string &filename) {
@@ -112,7 +113,8 @@ inline void ProgramState::loadFromFile(const std::string &filename) {
         >> building_position.y
         >> building_position.z
         >> is_bloom_enabled
-        >> exposure;
+        >> exposure
+        >> is_blinn_enabled;
 }
 
 // Move declarations from main

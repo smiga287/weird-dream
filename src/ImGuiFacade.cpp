@@ -26,10 +26,7 @@ void ImGuiFacade::draw(ProgramState* programState) {
 
 
     {
-        static float f = 0.0f;
-        ImGui::Begin("Hello window");
-        ImGui::Text("Hello text");
-        ImGui::SliderFloat("Float slider", &f, 0.0, 1.0);
+        ImGui::Begin("Weird dream");
         ImGui::ColorEdit3("Background color", (float *) &programState->clearColor);
         ImGui::DragFloat3("Building position", (float*)&programState->building_position);
         ImGui::DragFloat("Building scale", &programState->building_scale, 0.05, 0.1, 8.0);

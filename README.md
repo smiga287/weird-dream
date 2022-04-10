@@ -9,18 +9,26 @@
 - [x] Instancing
 - [x] HDR, Bloom
 
+# Controls
+
+- `f1` toggles the ImGui menu
+- `wasd` - usual movement keys
+
 # Requirements
 
 - `C++20` compatible compiler
 - `CMake >= 3.11`
-- All resources are included in the `resources/` directory
+- `Ninja` or `Make`
+- All resources are included in the `resources/` directory, which is why cloning will probably take a bit more time
 
 # Installation and usage
 
 ```bash
-$ git clone https://github.com/smiga287/futurama.git
-$ cd futurama
+$ git clone https://github.com/smiga287/weird-dream.git
+$ cd weird-dream
 $ mkdir build && cd build 
-$ cmake -G ninja .. # ninja is not mandatory, but is preferred
-$ ../weird_dream
+$ cmake -DCMAKE_BUILD_TYPE=Debug -G Ninja .. # Ninja is not mandatory, but is preferred
+$ ninja # alternatively use make
+$ cd ..
+$ ./weird_dream
 ```
