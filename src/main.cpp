@@ -12,7 +12,7 @@
 #include <program_state.h>
 #include <Floor.h>
 #include <drawing.h>
-#include <Benders.h>
+#include <Instances.h>
 #include <Bloom.h>
 
 std::unique_ptr<ProgramState> programState;
@@ -47,16 +47,16 @@ int main() {
     auto lights_merger_shader = Shader{"resources/shaders/lights_merger.vs", "resources/shaders/lights_merger.fs"};
 
     // load models
-    auto building_model = Model{"resources/objects/building/Home_work5.fbx"};
-    building_model.SetShaderTextureNamePrefix("material.");
+    auto main_model = Model{"resources/objects/room_pls/room.obj"};
+    main_model.SetShaderTextureNamePrefix("material.");
 
-    auto bender_model = Model("resources/objects/bender/bender.obj");
-    bender_model.SetShaderTextureNamePrefix("material.");
+    auto instance_model = Model("resources/objects/kamen/Stone.obj");
+    instance_model.SetShaderTextureNamePrefix("material.");
 
     // setup
     auto skybox = Skybox{skybox_shader};
     auto floor = Floor{lights_shader};
-    auto benders = Benders{bender_model, instance_shader, 1000};
+    auto instances = Instances{instance_model, instance_shader, 100};
     auto bloom = Bloom{lights_shader, lights_box_shader, lights_blur_shader, lights_merger_shader};
 
     // load textures
@@ -89,8 +89,8 @@ int main() {
         // render everything
         draw_floor(floor, *programState);
         draw_skybox(skybox, *programState);
-        draw_building(building_model, lights_shader, *programState);
-        draw_benders(benders, instance_shader, *programState);
+        draw_building(main_model, lights_shader, *programState);
+        draw_instances(instances, instance_shader, *programState);
 
         // blur bright fragments with two-pass Gaussian Blur
         bloom.computeGaussianBlur();
@@ -118,19 +118,24 @@ int main() {
 
 // process all input: query GLFW whether relevant keys are pressed/released this frame and react accordingly
 void processInput(GlfwWindow *window) {
-    if (window->isKeyPressed(GLFW_KEY_ESCAPE))
+    if (window->isKeyPressed(GLFW_KEY_ESCAPE)) {
         window->setShouldClose(true);
+    }
 
     auto& deltaTime = programState->deltaTime;
 
-    if (window->isKeyPressed(GLFW_KEY_W))
+    if (window->isKeyPressed(GLFW_KEY_W)) {
         programState->camera.ProcessKeyboard(FORWARD, deltaTime);
-    if (window->isKeyPressed(GLFW_KEY_S))
+    }
+    if (window->isKeyPressed(GLFW_KEY_S)) {
         programState->camera.ProcessKeyboard(BACKWARD, deltaTime);
-    if (window->isKeyPressed(GLFW_KEY_A))
+    }
+    if (window->isKeyPressed(GLFW_KEY_A)) {
         programState->camera.ProcessKeyboard(LEFT, deltaTime);
-    if (window->isKeyPressed(GLFW_KEY_D))
+    }
+    if (window->isKeyPressed(GLFW_KEY_D)) {
         programState->camera.ProcessKeyboard(RIGHT, deltaTime);
+    }
 }
 
 // glfw: whenever the window size changed (by OS or user resize) this callback function executes
