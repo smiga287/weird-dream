@@ -11,8 +11,8 @@
 #include <iostream>
 
 void Skybox::loadTextures() {
-    const std::string SKYBOX_PATH = FileSystem::getPath("resources/textures/skybox/");
-    const std::string EXT = true ? ".jpg" : ".png";
+    const std::string SKYBOX_PATH = FileSystem::getPath("resources/textures/skybox_dark_space/");
+    const std::string EXT = false ? ".jpg" : ".png";
     std::array skyboxSides = {
             SKYBOX_PATH + "rt" + EXT,
             SKYBOX_PATH + "lf" + EXT,
