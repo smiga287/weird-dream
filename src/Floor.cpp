@@ -90,10 +90,6 @@ void Floor::render(const glm::mat4 &model, const glm::mat4 &view, const glm::mat
     shader_.setMat4("view", view);
     shader_.setMat4("projection", projection);
 
-    // floor setup
-    // light properties
-//    shader_.setVec3("dirLight.specular", 0.5f, 0.5f, 0.5f);
-
     // material properties
     shader_.setFloat("material.shininess", 256.0f);
 

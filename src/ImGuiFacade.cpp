@@ -32,7 +32,7 @@ void ImGuiFacade::draw(ProgramState* programState) {
         ImGui::SliderFloat("Float slider", &f, 0.0, 1.0);
         ImGui::ColorEdit3("Background color", (float *) &programState->clearColor);
         ImGui::DragFloat3("Building position", (float*)&programState->building_position);
-        ImGui::DragFloat("Building scale", &programState->building_scale, 0.05, 0.1, 4.0);
+        ImGui::DragFloat("Building scale", &programState->building_scale, 0.05, 0.1, 8.0);
 
         ImGui::Checkbox("Flashlight", &programState->is_flashlight_enabled);
         ImGui::Checkbox("Blinn", &programState->is_blinn_enabled);

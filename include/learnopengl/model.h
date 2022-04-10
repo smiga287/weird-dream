@@ -59,7 +59,7 @@ private:
         // check for errors
         if(!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) // if is Not Zero
         {
-            cout << "ERROR::ASSIMP:: " << importer.GetErrorString() << endl;
+            cerr << "ERROR::ASSIMP:: " << importer.GetErrorString() << endl;
             return;
         }
         // retrieve the directory path of the filepath
@@ -173,8 +173,6 @@ private:
         std::vector<Texture> heightMaps = loadMaterialTextures(material, aiTextureType_AMBIENT, "texture_height");
         textures.insert(textures.end(), heightMaps.begin(), heightMaps.end());
 
-
-
         // return a mesh object created from the extracted mesh data
         return Mesh(vertices, indices, textures);
     }
@@ -246,10 +244,11 @@ unsigned int TextureFromFile(const char *path, const string &directory, bool gam
     }
     else
     {
-        std::cout << "Texture failed to load at path: " << path << std::endl;
+        std::cout << "Texture failed to load at the path: " << path << std::endl;
         stbi_image_free(data);
     }
 
     return textureID;
 }
+
 #endif
