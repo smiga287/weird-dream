@@ -4,8 +4,9 @@
 #include <Skybox.h>
 #include <Floor.h>
 #include <sstream>
-#include <Benders.h>
+#include <Instances.h>
 #include <Cube.h>
+#include <GLFW/glfw3.h>
 
 void setup_lighting(const Shader &lights_shader, const Shader &lights_box_shader, const ProgramState &state) {
     const PointLight& pointLight = state.pointLight;
@@ -13,7 +14,7 @@ void setup_lighting(const Shader &lights_shader, const Shader &lights_box_shader
 
     lights_shader.use();
     lights_shader.setVec3("viewPos", camera.Position);
-    lights_shader.setFloat("material.shininess", 16.0f); // TODO: try out 32.0f
+    lights_shader.setFloat("material.shininess", 16.0f);
     lights_shader.setInt("blinn", state.is_blinn_enabled);
     lights_shader.setInt("flashLight", state.is_flashlight_enabled);
 
@@ -30,6 +31,12 @@ void setup_lighting(const Shader &lights_shader, const Shader &lights_box_shader
          glm::vec3(state.building_position.x - 10.5f, state.building_position.y + 3.7f, state.building_position.z + 7.0f),
          glm::vec3(state.building_position.x + 0.5f, state.building_position.y + 6.0f, state.building_position.z + 3.0f)
     };
+    for (auto& v : pointLightPositions) {
+        auto time = glfwGetTime();
+        v.x *= sin(time) * 3.0f;
+        v.y *= cos(time) * 2.0f;
+        v.z *= sin(time) * 5.0f;
+    }
 
     constexpr static auto point_light_colors = std::array{
         glm::vec3(5.0f, 5.0f, 5.0f),
@@ -106,12 +113,12 @@ void draw_building(const Model& building_model, const Shader& shader, const Prog
     building_model.Draw(shader);
 }
 
-void draw_benders(const Benders& benders, const Shader& shader, const ProgramState& state) {
+void draw_instances(const Instances& instances, const Shader& shader, const ProgramState& state) {
     const auto& frame_memo = state.frame_memo;
     // set bender shader
     shader.use();
     shader.setMat4("projection", frame_memo.projection);
     shader.setMat4("view", frame_memo.view);
     shader.setInt("texture_diffuse", 0);
-    benders.render();
+    instances.render();
 }
