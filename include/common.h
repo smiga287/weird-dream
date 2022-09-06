@@ -4,10 +4,10 @@
 
 #ifndef PROJECT_BASE_COMMON_H
 #define PROJECT_BASE_COMMON_H
-#include <string>
 #include <fstream>
 #include <sstream>
+#include <string>
 
 using uint = unsigned int;
 
-#endif //PROJECT_BASE_COMMON_H
+#endif // PROJECT_BASE_COMMON_H

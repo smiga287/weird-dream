@@ -8,12 +8,13 @@
 
 class Random {
 public:
-    Random() : rng_(rand_dev_()) {};
-    int get_random() { return dist_(rng_); }
+  Random() : rng_(rand_dev_()){};
+  int get_random() { return dist_(rng_); }
+
 private:
-    std::random_device rand_dev_;
-    std::mt19937 rng_;
-    std::uniform_int_distribution<std::mt19937::result_type> dist_;
+  std::random_device rand_dev_;
+  std::mt19937 rng_;
+  std::uniform_int_distribution<std::mt19937::result_type> dist_;
 };
 
-#endif //FUTURAMA_RANDOM_H
+#endif // FUTURAMA_RANDOM_H
